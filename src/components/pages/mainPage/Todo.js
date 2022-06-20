@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
 import { uiColumnActions } from "../../../store/slices/uiColumn";
-import Column from "./Column";
-const Container = styled.div`
+const Container = styled.form`
   display: flex;
   width: 300px;
   height: 150px;
@@ -48,6 +47,11 @@ const Container = styled.div`
   span {
     color: black;
     cursor: pointer;
+    &:hover,
+    &:focus,
+    &:active {
+      color: rgb(0, 121, 191);
+    }
   }
   div {
     display: flex;
@@ -59,55 +63,47 @@ const Container = styled.div`
 
 const Todo = () => {
   const dispatch = useDispatch();
-  const items = useSelector((state) => state.column.items);
   const [data, setData] = useState({
     title: "",
   });
-  const [show, setShow] = useState(false);
 
   const inputChangeHandler = (e) => {
     const value = e.target.value;
     setData({
       ...data,
       id: Math.random().toString(),
-      [e.target.name]: value,
+      title: value,
     });
   };
-  const addDataHandler = () => {
-    dispatch(uiColumnActions.addTodo({}));
+  const addColumnHandler = () => {
+    if (data.title.trim().length === 0) {
+      return;
+    }
+   else{
+    dispatch(uiColumnActions.addColumn(data));
+    dispatch(uiColumnActions.isShow());
+   }
   };
 
-  const { id } = useSelector((state) => state.column.items);
-  const deleteColumnHandler = (id) => {
-    dispatch(uiColumnActions.deleteColumn(id));
+  const toggleHandler = () => {
+    dispatch(uiColumnActions.isShow());
   };
-
 
   return (
     <div style={{ display: "flex", margin: "auto 0" }}>
-      {items.map((item) => {
-        if (item.title === "todo") {
-          return (
-            <div key={item.id}>
-              <Container>
-                <input
-                  placeholder="Enter title"
-                  onChange={inputChangeHandler}
-                  value={data.title}
-                  name="title"
-                />
-                {/* <textarea  placeholder="Ввести заголовок списка" name="title" value={data.title} onChange={inputChangeHandler}></textarea> */}
-                <div>
-                  <button onClick={addDataHandler}>Add task</button>
-                  <span onClick={() => deleteColumnHandler(item.id)}>X</span>
-                </div>
-              </Container>
-            </div>
-          );
-        } else {
-          return <Column />;
-        }
-      })}
+      <Container onSubmit={(e) => e.preventDefault()}>
+        <input
+          placeholder="Enter title"
+          onChange={inputChangeHandler}
+          value={data.title}
+          name="title"
+        />
+
+        <div>
+          <button onClick={addColumnHandler}>Add task</button>
+          <span onClick={toggleHandler}>X</span>
+        </div>
+      </Container>
     </div>
   );
 };

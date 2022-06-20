@@ -2,29 +2,47 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isShow: false,
-  items: [
-    {
-      id: "1",
-      title: "hello",
-    },
-  ],
+  isShowTodo: false,
+  items: [],
 };
 
 const columnSlice = createSlice({
   name: "column",
   initialState,
   reducers: {
-    isShow(state, action) {
+    isShow(state) {
       state.isShow = !state.isShow;
     },
+    todoShow(state) {
+      state.isShowTodo = !state.isShowTodo;
+    },
     addColumn(state, action) {
-      const newTodo = action.payload;
-      state.items.pop();
-      state.items.push(newTodo.todo, newTodo.hello);
+      const newColumn = action.payload;
+      state.items.push({
+        id: newColumn.id,
+        title: newColumn.title,
+        todos: [],
+      });
     },
     addTodo(state, action) {
-      const newTodo = action.payload;
-      console.log(state.items);
+      const { todoData, id } = action.payload;
+      console.log(todoData, +"addtodo" + id);
+      state.items.map((item) => {
+        if (item.id === id) {
+          item.todos.push({
+            todo: todoData,
+          });
+        }
+      });
+    },
+    searchItems(state, action) {
+      let data = action.payload.includes();
+      console.log(data);
+      if (data.length > 0) {
+        state.items.filter((item) => {
+          return item.title.toLowerCase().includes(data.toLowerCase());
+        });
+      }
     },
     deleteColumn(state, action) {
       state.items = state.items.filter((item) => item.id !== action.payload);
